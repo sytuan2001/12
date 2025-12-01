@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Lái Xe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="game-container">
+    <div class="header">
+        <h1>Game Lái Xe</h1>
+        <div class="score-board">Điểm số: <span id="score">0</span></div>
+        <div class="instructions">
+            <p>Di chuyển: Phím Mũi tên (Lên, Xuống, Trái, Phải)</p>
+            <p>Tăng tốc: Phím Ctrl</p>
+            <p>Tránh chướng ngại vật (Màu đỏ), ăn phần thưởng (Màu vàng)</p>
+        </div>
+        <button id="restart-btn" style="display: none;">Chơi lại</button>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
