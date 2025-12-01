@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai Là Triệu Phú</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .prize-display {
+            font-size: 28px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .game-area {
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+        }
+
+        .main-content {
+            flex: 2;
+        }
+
+        .question-section {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-height: 150px;
+        }
+
+        .question-number {
+            color: #f39c12;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 22px;
+            line-height: 1.6;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            animation: correctAnswer 0.5s;
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            animation: wrongAnswer 0.5s;
+        }
+
+        @keyframes correctAnswer {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes wrongAnswer {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .lifelines {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .lifeline-btn {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lifeline-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+        }
+
+        .lifeline-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .prize-ladder {
+            flex: 1;
+            background: #34495e;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .prize-ladder h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #f39c12;
+        }
+
+        .prize-item {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .prize-item.current {
+            background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .prize-item.completed {
+            background: rgba(39, 174, 96, 0.3);
+        }
+
+        .start-screen, .end-screen {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .start-screen h2, .end-screen h2 {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .start-btn, .restart-btn {
+            background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-btn:hover, .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .final-prize {
+            font-size: 48px;
+            color: #f39c12;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="header">
+        <h1>🏆 AI LÀ TRIỆU PHÚ 🏆</h1>
+        <div class="prize-display" id="currentPrize">0 VNĐ</div>
+    </div>
+
+    <!-- Màn hình bắt đầu -->
+    <div id="startScreen" class="start-screen">
+        <h2>Chào mừng đến với Ai Là Triệu Phú!</h2>
+        <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 30px;">
+            Trả lời đúng 15 câu hỏi để trở thành triệu phú!<br>
+            Bạn có 3 quyền trợ giúp: 50:50, Hỏi ý kiến khán giả, và Gọi điện cho người thân.
+        </p>
+        <button class="start-btn" onclick="game.start()">BẮT ĐẦU CHƠI</button>
+    </div>
+
+    <!-- Màn hình chơi game -->
+    <div id="gameScreen" class="hidden">
+        <div class="game-area">
+            <div class="main-content">
+                <div class="question-section">
+                    <div class="question-number" id="questionNumber">Câu hỏi 1</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="answers-grid" id="answersGrid">
+                    <button class="answer-btn" onclick="game.selectAnswer(0)">
+                        <span>A: </span><span id="answer0"></span>
+                    </button>
+                    <button class="answer-btn" onclick="game.selectAnswer(1)">
+                        <span>B: </span><span id="answer1"></span>
+                    </button>
+                    <button class="answer-btn" onclick="game.selectAnswer(2)">
+                        <span>C: </span><span id="answer2"></span>
+                    </button>
+                    <button class="answer-btn" onclick="game.selectAnswer(3)">
+                        <span>D: </span><span id="answer3"></span>
+                    </button>
+                </div>
+
+                <div class="lifelines">
+                    <button class="lifeline-btn" id="fiftyFifty" onclick="game.useFiftyFifty()">
+                        50:50
+                    </button>
+                    <button class="lifeline-btn" id="askAudience" onclick="game.askAudience()">
+                        🎭 Hỏi khán giả
+                    </button>
+                    <button class="lifeline-btn" id="phoneCall" onclick="game.phoneCall()">
+                        📞 Gọi điện
+                    </button>
+                </div>
+            </div>
+
+            <div class="prize-ladder" id="prizeLadder"></div>
+        </div>
+    </div>
+
+    <!-- Màn hình kết thúc -->
+    <div id="endScreen" class="end-screen hidden">
+        <h2 id="endTitle"></h2>
+        <div class="final-prize" id="finalPrize"></div>
+        <p id="endMessage" style="font-size: 20px; color: #7f8c8d; margin-bottom: 30px;"></p>
+        <button class="restart-btn" onclick="game.restart()">CHƠI LẠI</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            question: "Thủ đô của Việt Nam là gì?",
+            answers: ["Hà Nội", "TP Hồ Chí Minh", "Đà Nẵng", "Huế"],
+            correct: 0
+        },
+        {
+            question: "Ai là tác giả của tác phẩm 'Truyện Kiều'?",
+            answers: ["Nguyễn Du", "Hồ Xuân Hương", "Nguyễn Trãi", "Cao Bá Quát"],
+            correct: 0
+        },
+        {
+            question: "Năm Bác Hồ đọc Tuyên ngôn độc lập là năm nào?",
+            answers: ["1954", "1945", "1975", "1930"],
+            correct: 1
+        },
+        {
+            question: "Dãy núi cao nhất Việt Nam là gì?",
+            answers: ["Trường Sơn", "Hoàng Liên Sơn", "Tây Nguyên", "Bạch Mã"],
+            correct: 1
+        },
+        {
+            question: "Quốc hoa của Việt Nam là gì?",
+            answers: ["Hoa hồng", "Hoa sen", "Hoa mai", "Hoa đào"],
+            correct: 1
+        },
+        {
+            question: "Châu lục nào có diện tích lớn nhất?",
+            answers: ["Châu Phi", "Châu Á", "Châu Mỹ", "Châu Âu"],
+            correct: 1
+        },
+        {
+            question: "Ai là người phát hiện ra thuyết tương đối?",
+            answers: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Stephen Hawking"],
+            correct: 1
+        },
+        {
+            question: "Đại dương nào sâu nhất thế giới?",
+            answers: ["Đại Tây Dương", "Thái Bình Dương", "Ấn Độ Dương", "Bắc Băng Dương"],
+            correct: 1
+        },
+        {
+            question: "Kim tự tháp Giza nằm ở quốc gia nào?",
+            answers: ["Mexico", "Ai Cập", "Hy Lạp", "Ấn Độ"],
+            correct: 1
+        },
+        {
+            question: "Nguyên tố hóa học nào có ký hiệu là 'Au'?",
+            answers: ["Bạc", "Vàng", "Đồng", "Sắt"],
+            correct: 1
+        },
+        {
+            question: "Ai vẽ bức tranh 'Mona Lisa'?",
+            answers: ["Picasso", "Leonardo da Vinci", "Van Gogh", "Michelangelo"],
+            correct: 1
+        },
+        {
+            question: "Hành tinh nào lớn nhất hệ Mặt Trời?",
+            answers: ["Thổ Tinh", "Mộc Tinh", "Thiên Vương Tinh", "Hải Vương Tinh"],
+            correct: 1
+        },
+        {
+            question: "DNA được cấu tạo từ bao nhiêu loại base nitơ?",
+            answers: ["2", "4", "6", "8"],
+            correct: 1
+        },
+        {
+            question: "Quốc gia nào có dân số đông nhất thế giới?",
+            answers: ["Ấn Độ", "Trung Quốc", "Mỹ", "Indonesia"],
+            correct: 0
+        },
+        {
+            question: "Tốc độ ánh sáng trong chân không là bao nhiêu?",
+            answers: ["300,000 km/s", "299,792 km/s", "150,000 km/s", "500,000 km/s"],
+            correct: 1
+        }
+    ];
+
+    const prizes = [
+        "200.000 VNĐ", "400.000 VNĐ", "600.000 VNĐ", "1.000.000 VNĐ", "2.000.000 VNĐ",
+        "3.000.000 VNĐ", "6.000.000 VNĐ", "10.000.000 VNĐ", "14.000.000 VNĐ", "22.000.000 VNĐ",
+        "30.000.000 VNĐ", "40.000.000 VNĐ", "60.000.000 VNĐ", "85.000.000 VNĐ", "150.000.000 VNĐ"
+    ];
+
+    class Game {
+        constructor() {
+            this.currentQuestion = 0;
+            this.lifelines = {
+                fiftyFifty: true,
+                askAudience: true,
+                phoneCall: true
+            };
+        }
+
+        start() {
+            this.currentQuestion = 0;
+            this.lifelines = {
+                fiftyFifty: true,
+                askAudience: true,
+                phoneCall: true
+            };
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            this.updateLifelines();
+            this.createPrizeLadder();
+            this.loadQuestion();
+        }
+
+        createPrizeLadder() {
+            const ladder = document.getElementById('prizeLadder');
+            ladder.innerHTML = '<h3>Thang điểm</h3>';
+
+            for (let i = prizes.length - 1; i >= 0; i--) {
+                const item = document.createElement('div');
+                item.className = 'prize-item';
+                item.textContent = `${i + 1}. ${prizes[i]}`;
+                item.id = `prize${i}`;
+                ladder.appendChild(item);
+            }
+        }
+
+        updatePrizeLadder() {
+            for (let i = 0; i < prizes.length; i++) {
+                const item = document.getElementById(`prize${i}`);
+                item.classList.remove('current', 'completed');
+
+                if (i === this.currentQuestion) {
+                    item.classList.add('current');
+                } else if (i < this.currentQuestion) {
+                    item.classList.add('completed');
+                }
+            }
+        }
+
+        loadQuestion() {
+            if (this.currentQuestion >= questions.length) {
+                this.endGame(true);
+                return;
+            }
+
+            const q = questions[this.currentQuestion];
+            document.getElementById('questionNumber').textContent =
+                `Câu hỏi ${this.currentQuestion + 1} - ${prizes[this.currentQuestion]}`;
+            document.getElementById('questionText').textContent = q.question;
+            document.getElementById('currentPrize').textContent =
+                this.currentQuestion > 0 ? prizes[this.currentQuestion - 1] : "0 VNĐ";
+
+            for (let i = 0; i < 4; i++) {
+                const btn = document.querySelectorAll('.answer-btn')[i];
+                const answerText = document.getElementById(`answer${i}`);
+                answerText.textContent = q.answers[i];
+                btn.disabled = false;
+                btn.className = 'answer-btn';
+                btn.style.display = 'block';
+            }
+
+            this.updatePrizeLadder();
+        }
+
+        selectAnswer(index) {
+            const q = questions[this.currentQuestion];
+            const buttons = document.querySelectorAll('.answer-btn');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+
+                setTimeout(() => {
+                    this.currentQuestion++;
+                    this.loadQuestion();
+                }, 1500);
+            } else {
+                buttons[index].classList.add('wrong');
+                buttons[q.correct].classList.add('correct');
+
+                setTimeout(() => {
+                    this.endGame(false);
+                }, 2000);
+            }
+        }
+
+        useFiftyFifty() {
+            if (!this.lifelines.fiftyFifty) return;
+
+            this.lifelines.fiftyFifty = false;
+            document.getElementById('fiftyFifty').disabled = true;
+
+            const q = questions[this.currentQuestion];
+            const wrongAnswers = [];
+
+            for (let i = 0; i < 4; i++) {
+                if (i !== q.correct) {
+                    wrongAnswers.push(i);
+                }
+            }
+
+            const toRemove = [];
+            while (toRemove.length < 2) {
+                const idx = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+                if (!toRemove.includes(idx)) {
+                    toRemove.push(idx);
+                }
+            }
+
+            toRemove.forEach(idx => {
+                document.querySelectorAll('.answer-btn')[idx].style.display = 'none';
+            });
+        }
+
+        askAudience() {
+            if (!this.lifelines.askAudience) return;
+
+            this.lifelines.askAudience = false;
+            document.getElementById('askAudience').disabled = true;
+
+            const q = questions[this.currentQuestion];
+            const percentages = [0, 0, 0, 0];
+            percentages[q.correct] = 60 + Math.random() * 25;
+
+            let remaining = 100 - percentages[q.correct];
+            for (let i = 0; i < 4; i++) {
+                if (i !== q.correct) {
+                    const p = Math.random() * remaining;
+                    percentages[i] = p;
+                    remaining -= p;
+                }
+            }
+
+            let msg = "Kết quả khảo sát khán giả:\n";
+            const labels = ['A', 'B', 'C', 'D'];
+            for (let i = 0; i < 4; i++) {
+                msg += `${labels[i]}: ${percentages[i].toFixed(0)}%\n`;
+            }
+
+            alert(msg);
+        }
+
+        phoneCall() {
+            if (!this.lifelines.phoneCall) return;
+
+            this.lifelines.phoneCall = false;
+            document.getElementById('phoneCall').disabled = true;
+
+            const q = questions[this.currentQuestion];
+            const labels = ['A', 'B', 'C', 'D'];
+            const confidence = Math.random() > 0.2 ? 80 + Math.random() * 15 : 40 + Math.random() * 20;
+
+            alert(`Người thân: "Tôi ${confidence.toFixed(0)}% chắc chắn đáp án là ${labels[q.correct]}!"`);
+        }
+
+        updateLifelines() {
+            document.getElementById('fiftyFifty').disabled = !this.lifelines.fiftyFifty;
+            document.getElementById('askAudience').disabled = !this.lifelines.askAudience;
+            document.getElementById('phoneCall').disabled = !this.lifelines.phoneCall;
+        }
+
+        endGame(won) {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+
+            if (won) {
+                document.getElementById('endTitle').textContent = "🎉 CHÚC MỪNG! 🎉";
+                document.getElementById('finalPrize').textContent = prizes[prizes.length - 1];
+                document.getElementById('endMessage').textContent =
+                    "Bạn đã trở thành triệu phú! Xuất sắc!";
+            } else {
+                const prize = this.currentQuestion > 0 ? prizes[this.currentQuestion - 1] : "0 VNĐ";
+                document.getElementById('endTitle').textContent = "Game Over";
+                document.getElementById('finalPrize').textContent = prize;
+                document.getElementById('endMessage').textContent =
+                    `Bạn đã về với ${prize}. Cố gắng lần sau nhé!`;
+            }
+        }
+
+        restart() {
+            this.start();
+        }
+    }
+
+    const game = new Game();
+</script>
+</body>
+</html>
